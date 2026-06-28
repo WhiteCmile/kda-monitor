@@ -224,6 +224,47 @@ def init_workspace(task: dict, force: bool = False) -> bool:
     """)
     (ws_path / "solution.py").write_text(initial_solution)
 
+    # 6b. Inject baseline if available in baseline-results/
+    baseline_results_dir = INFRA_DIR / "baseline-results"
+    # Map workspace back to baseline-results path: fi_002_name → FlashInfer-Bench/002_name
+    group_map_reverse = {v: k for k, v in GROUP_PREFIX.items()}
+    # e.g. dir_name = "fi_002_fused_add_rmsnorm_h4096" → prefix="fi", remainder="002_fused_..."
+    parts = dir_name.split("_", 1)
+    if len(parts) == 2:
+        prefix, remainder = parts[0], parts[1]
+        group_dir_name = {"fi": "FlashInfer-Bench"}.get(prefix, group_map_reverse.get(prefix, ""))
+        if group_dir_name:
+            traces_file = baseline_results_dir / group_dir_name / remainder / "traces.json"
+            baseline_target = ws_path / "outputs" / "baseline.json"
+            if traces_file.exists() and not baseline_target.exists():
+                import json as _json
+                raw_traces = _json.loads(traces_file.read_text())
+                workload_results = []
+                for i, trace in enumerate(raw_traces):
+                    ev = trace.get("evaluation", {})
+                    perf = ev.get("performance") or {}
+                    corr = ev.get("correctness") or {}
+                    workload_results.append({
+                        "workload_index": i,
+                        "status": ev.get("status", "UNKNOWN"),
+                        "latency_ms": perf.get("latency_ms", 0.0),
+                        "reference_latency_ms": perf.get("reference_latency_ms", 0.0),
+                        "speedup": perf.get("speedup_factor", 0.0),
+                        "max_abs_err": corr.get("max_absolute_error", 0.0),
+                        "max_rel_err": corr.get("max_relative_error", 0.0),
+                        "passed": ev.get("status") == "PASSED",
+                    })
+                from datetime import datetime, timezone
+                baseline_data = {
+                    "task_id": dir_name,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "iterations": 50,
+                    "max_workloads": None,
+                    "raw_traces": raw_traces,
+                    "workload_results": workload_results,
+                }
+                baseline_target.write_text(_json.dumps(baseline_data, indent=2))
+
     # 7. Git init + initial commit
     env = os.environ.copy()
     env["GIT_AUTHOR_NAME"] = "workspace-init"

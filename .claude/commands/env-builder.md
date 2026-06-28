@@ -84,7 +84,17 @@ cd <workspace>
 
 **IMPORTANT:** These must be serialized (GPU lock). Run them sequentially within each sub-agent.
 
-Store results in `<infra-dir>/baseline-results/<group>/<problem_name>/`.
+Store results in `<infra-dir>/baseline-results/<group>/<problem_name>/traces.json`.
+
+### Step 4b: Distribute Baselines to Workspaces
+
+After baselines are collected, distribute them into each workspace so workers don't re-run them:
+
+```bash
+python3 <infra-dir>/scripts/distribute-baselines.py
+```
+
+This converts `baseline-results/<group>/<name>/traces.json` → `workspaces/<name>/outputs/baseline.json` in the format `bench.py` expects. Workspaces that already have `outputs/baseline.json` are skipped.
 
 **Parallelization:** Can fan out sub-agents by group, but GPU runs within each agent are sequential.
 
@@ -101,8 +111,9 @@ For each workspace, verify ALL of the following:
 - `docs/phase1-prompt.md` exists, non-empty, has correct task ID, I/O table, bottleneck, Phase 2/3 instructions
 
 **Baselines:**
-- Baseline traces exist in `outputs/baseline_traces/` or `<infra-dir>/baseline-results/`
-- Baseline ran successfully (all workloads passed)
+- `outputs/baseline.json` exists (injected by distribute-baselines.py or init_workspace.py)
+- Baseline contains valid `workload_results` with latency data
+- All workloads in baseline show `"passed": true`
 
 **Scripts:**
 - `<infra-dir>/scripts/bench.py` exists and is executable
