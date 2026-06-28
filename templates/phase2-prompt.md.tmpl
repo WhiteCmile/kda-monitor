@@ -93,12 +93,12 @@ After RLCR completes:
 
 1. Validate correctness on all workloads:
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 120
+gpu-run.sh uv run --project {{SOL_ROOT}} scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 120
 ```
 
 2. Benchmark performance:
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 300 --iterations 50
+gpu-run.sh uv run --project {{SOL_ROOT}} scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 300 --iterations 50
 ```
 
 3. Compare against current best (`{{CURRENT_BEST_CANDIDATE}}`):

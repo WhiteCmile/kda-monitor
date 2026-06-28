@@ -77,6 +77,15 @@ cat > "$WORKSPACE/status.json" << EOF
 }
 EOF
 
+# Ensure git working tree is clean (RLCR requires this)
+cd "$WORKSPACE"
+if ! git diff --quiet HEAD 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+    git add -A
+    git commit -m "pre-worker: sync workspace state" --allow-empty \
+        --author="kda-orchestrator <noreply@kernel-agent>" 2>/dev/null || true
+fi
+cd - >/dev/null
+
 # Launch worker in tmux (interactive session, reads prompt from file)
 # No pipe to tee — pipe kills tty, making claude buffer all output.
 # Use tmux capture-pane for monitoring, tmux pipe-pane for logging.

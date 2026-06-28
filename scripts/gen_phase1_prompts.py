@@ -8,7 +8,7 @@ import yaml
 from collections import defaultdict
 from pathlib import Path
 
-INFRA_ROOT = Path("/mnt/public/zhaotianlang/projects/kernel-agent/infra")
+INFRA_ROOT = Path(__file__).resolve().parent.parent
 TASKS_YAML = INFRA_ROOT / "tasks.yaml"
 WORKSPACES_ROOT = INFRA_ROOT / "workspaces"
 
@@ -185,7 +185,7 @@ def generate_prompt(task: dict, group_name: str) -> str:
 3. Optimization focus ({bottleneck}-bound):
 {bottleneck_guidance(bottleneck)}
 4. Use `/KernelWiki` skill to research relevant H800 optimization techniques
-5. Run baseline: `gpu-run.sh python3 /mnt/public/zhaotianlang/projects/kernel-agent/infra/scripts/bench.py .`
+5. Run baseline: `./gpu-run.sh python3 ../../scripts/bench.py .`
 6. Write `docs/draft.md` using `/humanize:explore-idea` or manually, containing:
    - Primary optimization direction with objective evidence
    - 2-3 alternative directions with trade-off analysis

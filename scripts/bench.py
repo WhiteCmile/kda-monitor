@@ -33,7 +33,11 @@ from typing import Any, Optional
 # Constants
 # ---------------------------------------------------------------------------
 
-SOL_EXECBENCH_PROJECT = Path("/mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench")
+SCRIPT_DIR = Path(__file__).resolve().parent
+INFRA_DIR = SCRIPT_DIR.parent
+PROJECT_ROOT = INFRA_DIR.parent
+
+SOL_EXECBENCH_PROJECT = Path(os.environ.get("SOL_ROOT", str(PROJECT_ROOT / "sol-execbench")))
 RUN_DATASET_SCRIPT = SOL_EXECBENCH_PROJECT / "scripts" / "run_dataset.py"
 
 DEFAULT_ITERATIONS = 50

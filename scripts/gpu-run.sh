@@ -8,25 +8,27 @@
 #   GPU_ID  -- GPU device index (default: 0)
 set -euo pipefail
 
-LOCK_FILE=/var/lock/gpu.lock
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../config.env"
+
+LOCK_FILE="$GPU_LOCK_FILE"
 GPU_ID=${GPU_ID:-0}
 
-# FlashInfer safetensors workloads need this
-export FLASHINFER_TRACE_DIR=${FLASHINFER_TRACE_DIR:-/mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench/data}
+export FLASHINFER_TRACE_DIR=${FLASHINFER_TRACE_DIR:-$SOL_ROOT/data}
 
 (
   flock -x 200
 
-  # Pin clocks for reproducible benchmarks
-  sudo -n nvidia-smi -i "$GPU_ID" -lgc 1980,1980 2>/dev/null || true
-  sudo -n nvidia-smi -i "$GPU_ID" -lmc 2619 2>/dev/null || true
+  # Pin clocks for reproducible benchmarks (may fail without permission — non-fatal)
+  nvidia-smi -i "$GPU_ID" -lgc 1980,1980 &>/dev/null || true
+  nvidia-smi -i "$GPU_ID" -lmc 2619 &>/dev/null || true
 
   "$@"
   EXIT_CODE=$?
 
   # Reset clocks
-  sudo -n nvidia-smi -i "$GPU_ID" -rgc 2>/dev/null || true
-  sudo -n nvidia-smi -i "$GPU_ID" -rmc 2>/dev/null || true
+  nvidia-smi -i "$GPU_ID" -rgc &>/dev/null || true
+  nvidia-smi -i "$GPU_ID" -rmc &>/dev/null || true
 
   exit $EXIT_CODE
 ) 200>"$LOCK_FILE"

@@ -37,13 +37,13 @@ Pay attention to:
 Validate and benchmark the reference implementation to establish your target:
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name problem/reference.py -o outputs/traces --timeout 120
+gpu-run.sh uv run --project {{SOL_ROOT}} scripts/run_dataset.py problem/ --solution-name problem/reference.py -o outputs/traces --timeout 120
 ```
 
 Then benchmark with timing:
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name problem/reference.py -o outputs/traces --timeout 300 --iterations 50
+gpu-run.sh uv run --project {{SOL_ROOT}} scripts/run_dataset.py problem/ --solution-name problem/reference.py -o outputs/traces --timeout 300 --iterations 50
 ```
 
 Record the baseline SOL scores and latencies from the output. Save a summary to `outputs/baseline_summary.txt`.

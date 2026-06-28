@@ -25,12 +25,15 @@ import yaml
 # ---------------------------------------------------------------------------
 
 INFRA_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = INFRA_DIR.parent
 TASKS_YAML = INFRA_DIR / "tasks.yaml"
 TEMPLATE_DIR = INFRA_DIR / "templates"
 WORKSPACE_ROOT = INFRA_DIR / "workspaces"
 
 CLAUDE_MD_TEMPLATE = TEMPLATE_DIR / "CLAUDE.md.tmpl"
 GITIGNORE_TEMPLATE = TEMPLATE_DIR / "gitignore.tmpl"
+
+SOL_ROOT = Path(os.environ.get("SOL_ROOT", str(PROJECT_ROOT / "sol-execbench")))
 
 # ---------------------------------------------------------------------------
 # Group prefix mapping
@@ -153,6 +156,7 @@ def render_claude_md(task: dict, definition: dict, run_signature: str) -> str:
         "{{RUN_SIGNATURE}}": run_signature,
         "{{INPUTS_TABLE}}": inputs_table,
         "{{OUTPUTS_TABLE}}": outputs_table,
+        "{{SOL_ROOT}}": str(SOL_ROOT),
     }
 
     result = template
@@ -165,7 +169,11 @@ def init_workspace(task: dict, force: bool = False) -> bool:
     """Create a single workspace. Returns True if created, False if skipped."""
     dir_name = workspace_dir_name(task)
     ws_path = WORKSPACE_ROOT / dir_name
-    problem_abs = Path(task["data_root"]) / task["problem_dir"]
+    # Resolve data_root relative to INFRA_DIR if not absolute
+    data_root = Path(task["data_root"])
+    if not data_root.is_absolute():
+        data_root = (INFRA_DIR / data_root).resolve()
+    problem_abs = data_root / task["problem_dir"]
 
     # Check if workspace already exists
     if ws_path.exists():
@@ -190,6 +198,11 @@ def init_workspace(task: dict, force: bool = False) -> bool:
     # 2. Create symlink to problem directory
     symlink_path = ws_path / "problem"
     symlink_path.symlink_to(problem_abs)
+
+    # 2b. Create symlink to gpu-run.sh
+    gpu_run_link = ws_path / "gpu-run.sh"
+    if not gpu_run_link.exists():
+        gpu_run_link.symlink_to("../../scripts/gpu-run.sh")
 
     # 3. Read definition.json and reference.py
     definition = read_definition_json(problem_abs)
@@ -219,6 +232,8 @@ def init_workspace(task: dict, force: bool = False) -> bool:
     env["GIT_COMMITTER_EMAIL"] = "noreply@kernel-agent"
 
     subprocess.run(["git", "init", "-b", "main"], cwd=ws_path, capture_output=True, check=True)
+    subprocess.run(["git", "config", "user.email", "kernel-agent@workspace.local"], cwd=ws_path, capture_output=True, check=True)
+    subprocess.run(["git", "config", "user.name", "Kernel Agent"], cwd=ws_path, capture_output=True, check=True)
     subprocess.run(["git", "add", "-A"], cwd=ws_path, capture_output=True, check=True)
     subprocess.run(
         ["git", "commit", "-m", f"init workspace for {task['id']}: {task['name']}"],

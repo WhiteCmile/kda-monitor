@@ -13,7 +13,7 @@ import sys
 import json
 from pathlib import Path
 
-INFRA = Path("/mnt/public/zhaotianlang/projects/kernel-agent/infra")
+INFRA = Path(__file__).resolve().parent.parent
 PASS = 0
 FAIL = 0
 

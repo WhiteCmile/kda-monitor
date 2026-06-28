@@ -50,7 +50,7 @@ Create `candidates/candidate_NNN.py` (starting from 001). Each candidate must ex
 ### 2. Validate correctness
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 120
+./gpu-run.sh uv run --project {{SOL_ROOT}} {{SOL_ROOT}}/scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 120
 ```
 
 This runs the candidate against all workloads and checks output correctness. **All workloads must pass before benchmarking.**
@@ -58,7 +58,7 @@ This runs the candidate against all workloads and checks output correctness. **A
 ### 3. Benchmark performance
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 300 --iterations 50
+./gpu-run.sh uv run --project {{SOL_ROOT}} {{SOL_ROOT}}/scripts/run_dataset.py problem/ --solution-name candidates/candidate_NNN.py -o outputs/traces --timeout 300 --iterations 50
 ```
 
 ### 4. Promote the best candidate
@@ -70,7 +70,7 @@ cp candidates/candidate_NNN.py solution.py
 Then validate solution.py:
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name solution.py -o outputs/traces --timeout 120
+./gpu-run.sh uv run --project {{SOL_ROOT}} {{SOL_ROOT}}/scripts/run_dataset.py problem/ --solution-name solution.py -o outputs/traces --timeout 120
 ```
 
 ### 5. Iterate
@@ -78,7 +78,7 @@ gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-e
 Read benchmark traces in `outputs/traces/` to identify remaining bottlenecks. Use NCU profiling if needed:
 
 ```bash
-gpu-run.sh ncu --set full -o profile/candidate_NNN <kernel-launch-command>
+./gpu-run.sh ncu --set full -o profile/candidate_NNN <kernel-launch-command>
 ```
 
 Then write the next candidate incorporating improvements.
@@ -86,7 +86,7 @@ Then write the next candidate incorporating improvements.
 ## Benchmark evaluation
 
 ```bash
-gpu-run.sh uv run --project /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench scripts/run_dataset.py problem/ --solution-name solution.py -o outputs/traces --timeout 300 --iterations 50
+./gpu-run.sh uv run --project {{SOL_ROOT}} {{SOL_ROOT}}/scripts/run_dataset.py problem/ --solution-name solution.py -o outputs/traces --timeout 300 --iterations 50
 ```
 
 The SOL score in the output measures your solution's throughput relative to hardware peak. Higher is better.

@@ -13,8 +13,8 @@ Build a complete optimization environment for a set of GPU kernel operators. Thi
 
 Optional flags (parse from `$ARGUMENTS`):
 - `--filter <pattern>` — Only include problems matching pattern (e.g. `FlashInfer/*`, `L1/04*`)
-- `--sol-root <path>` — Path to sol-execbench repo (default: `/mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench`)
-- `--infra-dir <path>` — Path to infra directory (default: `/mnt/public/zhaotianlang/projects/kernel-agent/infra`)
+- `--sol-root <path>` — Path to sol-execbench repo (default: `../sol-execbench` relative to infra/)
+- `--infra-dir <path>` — Path to infra directory (default: current repo root)
 - `--dashboard` — Also set up Feishu Bitable dashboard
 - `--dry-run` — Show what would be created without doing it
 
@@ -46,9 +46,10 @@ For each task in `tasks.yaml`:
    - Use the problem number and a shortened name
 2. Create subdirectories: `candidates/`, `docs/`, `outputs/`, `profile/`, `runs/`
 3. Create `problem/` symlink → sol-execbench problem directory
-4. Create initial `solution.py`: `from problem.reference import run`
-5. Initialize git repo: `git init && git add -A && git commit -m "Initial workspace"`
-6. Generate `CLAUDE.md` from template at `<infra-dir>/templates/CLAUDE.md.tmpl`
+4. Create `gpu-run.sh` symlink → `../../scripts/gpu-run.sh`
+5. Create initial `solution.py`: `from problem.reference import run`
+6. Initialize git repo: `git init && git add -A && git commit -m "Initial workspace"`
+7. Generate `CLAUDE.md` from template at `<infra-dir>/templates/CLAUDE.md.tmpl`
 
 Use `python3 <infra-dir>/scripts/init_workspace.py` if available, or create workspaces directly.
 
@@ -74,7 +75,7 @@ For each workspace, run the reference implementation to establish baseline perfo
 
 ```bash
 cd <workspace>
-/mnt/public/zhaotianlang/projects/kernel-agent/infra/scripts/gpu-run.sh \
+./gpu-run.sh \
     uv run --project <sol-root> scripts/run_dataset.py problem/ \
     --solution-name problem/reference.py \
     -o outputs/baseline_traces \
@@ -95,6 +96,7 @@ For each workspace, verify ALL of the following:
 - `CLAUDE.md` exists, non-empty, has correct task header
 - `solution.py` exists
 - `problem/` symlink resolves to valid directory with `definition.json`, `reference.py`, `workload.jsonl`
+- `gpu-run.sh` symlink resolves to `../../scripts/gpu-run.sh`
 - `candidates/`, `docs/`, `outputs/`, `profile/`, `runs/` directories exist
 - `docs/phase1-prompt.md` exists, non-empty, has correct task ID, I/O table, bottleneck, Phase 2/3 instructions
 

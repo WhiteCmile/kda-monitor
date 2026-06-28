@@ -59,7 +59,7 @@ infra/
 ### 1. `problem/` is a symlink, not a copy
 
 ```bash
-ln -s /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench/data/benchmark/<problem_dir> problem
+ln -s $SOL_ROOT/data/benchmark/<problem_dir> problem
 ```
 
 - Benchmark data stays read-only and shared across all users

@@ -9,7 +9,7 @@ Maximize the number of tasks that achieve speedup > 1.0x over their reference ba
 ## Infrastructure Layout
 
 ```
-/mnt/public/zhaotianlang/projects/kernel-agent/infra/
+$INFRA_DIR/
 ├── tasks.yaml              # Task registry (60 operators, status tracking)
 ├── workspaces/             # One workspace per task
 ├── scripts/                # bench.py, gpu-run.sh, init_workspace.py
@@ -99,12 +99,12 @@ If active workers < 3 (or < 5 after first 10 complete):
 
 ```bash
 # 1. Prepare
-WORKSPACE="/mnt/public/zhaotianlang/projects/kernel-agent/infra/workspaces/<name>"
+WORKSPACE="$INFRA_DIR/workspaces/<name>"
 WINDOW_NAME="<short_name>"  # e.g. fi_002
 
 # 2. Create tmux window and launch claude
 tmux new-window -t kda -n "$WINDOW_NAME" \
-  "cd $WORKSPACE && claude -p \"$(cat /mnt/public/zhaotianlang/projects/kernel-agent/infra/templates/worker-prompt.md)
+  "cd $WORKSPACE && claude -p \"$(cat $INFRA_DIR/templates/worker-prompt.md)
 
 $(cat docs/phase1-prompt.md)\" --dangerously-skip-permissions 2>&1 | tee runs/worker_$(date +%Y%m%d_%H%M%S).log; bash"
 

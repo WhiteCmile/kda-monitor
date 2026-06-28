@@ -19,7 +19,7 @@ Parse the action from `$ARGUMENTS`.
 ## Infrastructure Layout
 
 ```
-/mnt/public/zhaotianlang/projects/kernel-agent/infra/
+
 ├── tasks.yaml              # Task registry (60 operators)
 ├── workspaces/             # One workspace per task
 ├── scripts/                # bench.py, gpu-run.sh, start-worker.sh
@@ -120,7 +120,7 @@ Write updated `orchestrator/state.json`:
 ## Starting a Worker (`start` action)
 
 ```bash
-bash /mnt/public/zhaotianlang/projects/kernel-agent/infra/scripts/start-worker.sh <TASK_ID>
+bash scripts/start-worker.sh <TASK_ID>
 ```
 
 After starting:

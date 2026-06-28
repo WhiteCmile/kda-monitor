@@ -5,11 +5,12 @@
 # Validation/eval commands use sol-execbench CLI via run_dataset.py.
 # GPU-bound commands are wrapped by gpu-run.sh at runtime (infra external lock).
 #
-# Data root: /mnt/public/qinhaiyan/sol-execbench/data/benchmark
+# Paths are relative to the project root (parent of infra/).
+# At runtime, scripts resolve PROJECT_ROOT from their own location.
 
 defaults:
-  sol_root: /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench
-  data_root: /mnt/public/zhaotianlang/projects/kernel-agent/sol-execbench/data/benchmark
+  sol_root: ../sol-execbench
+  data_root: ../sol-execbench/data/benchmark
   validation_cmd_template: >-
     uv run scripts/run_dataset.py {problem_dir} --solution-name solution.py -o {workspace}/out --timeout 120
   eval_cmd_template: >-
